@@ -1,0 +1,37 @@
+
+<!doctype html>
+<html>
+    <head>
+        <title>Ancestry Clusters</title>
+    </head>
+    <style type="text/css">
+	body {
+            margin: 5px;
+        }
+	h1 {
+	    font-size: 15px;
+	    text-align: center;
+        }
+    </style>
+    <body>
+        <h1>Settings</h1>
+        Maximum CM Match: <input type="number" id="txtMaxCM" value="400"></input>
+        </P>
+        Minimum CM Match: <input type="number" id="txtMinCM" value="90"></input>
+        </P>
+        <h1>Operations</h1>
+        <button id="btnSetMatchList">Set Match List</button>
+        </P>
+        <button id="btnGetSharedMatches">Gather Shared Matches</button>
+        </P>
+        <div id="divMatchingProgress" hidden="true">
+            <label>Matching </label> <label id="lblSharedMatch"></label>
+            <progress id="prgMatchGathering" max="100" value="0">  </progress>    
+        </div>
+        </P>
+        <button id="btnClearMatchData">Clear All Data</button>
+        </P>
+        <button id="btnShowSharedMatches">Show Matches</button>
+    </body>
+    <script src="popup.js"></script>
+</html>

@@ -1,0 +1,28 @@
+{
+	"manifest_version": 2,
+	"name": "Ancestry Cluster Extension",
+	"description": "Builds Cluster Data For Ancestry",
+    "version": "0.1",
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "storage",
+        "https://www.ancestry.com/"
+      ],
+    "content_scripts": [
+        {
+            "matches": ["https://www.ancestry.com/discoveryui-matches/match-list/*", 
+                        "https://www.ancestry.com/discoveryui-matches/compare/*"],
+            "js": ["contentScript.js"]
+        }
+    ],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": false
+      },          
+	"browser_action": {
+ 		"default_icon": "image.png",
+ 		"default_popup": "popup.html",
+ 		"default_title": "Ancestry Cluster Extension"
+ 	}
+}
