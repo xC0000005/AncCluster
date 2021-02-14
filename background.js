@@ -13,3 +13,20 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
 
     return true;
   });
+
+  // When the extension is installed or upgraded ...
+  chrome.runtime.onInstalled.addListener(function() {
+    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+      alert("Active");
+      chrome.declarativeContent.onPageChanged.addRules([
+        {
+          conditions: [
+            new chrome.declarativeContent.PageStateMatcher({
+              pageUrl: { pathContains: 'match-list' },
+            })
+          ],
+          actions: [ new chrome.declarativeContent.ShowPageAction() ]
+        }
+      ]);
+    });
+  });
