@@ -120,6 +120,9 @@ async function getMatchPage(fetchUrl, match_id, minCM, maxCM, page) {
                 getSharedMatchesButton.disabled = false;
             }
 
+            var matchLabel = document.getElementById("lblSharedMatch");
+            matchLabel.textContent = "Matching Complete.";
+        
             chrome.storage.local.set({'matchData': sharedMatchMapping});
         }
 
@@ -174,6 +177,7 @@ async function gatherSharedMatches(url) {
       }
 
     progressBar.max = count;
+    progressBar.value = 0;
 
     count = 0;
     // This is the format of the match list URL:
@@ -185,6 +189,8 @@ async function gatherSharedMatches(url) {
         
         progressBar.value = count;
         matchLabel.textContent = "Matching " + sharedMatchMapping.Matches[propertyName].Name;
+        window.requestAnimationFrame(() => {});
+
         var testId = sharedMatchMapping.Matches[propertyName].TestId;
         let fullFetchUrl = 'https://www.ancestry.com/discoveryui-matchesservice/api/samples/SAMPLEID/matches/list?page=PAGE_NUMBER&relationguid=SHAREDMATCH_TEST_ID&sortby=RELATIONSHIP'
             .replace('SAMPLEID', sharedMatchMapping.PrimarySampleId)
@@ -193,8 +199,6 @@ async function gatherSharedMatches(url) {
         await getMatchPage(fullFetchUrl, testId, sharedMatchMapping.minCM, sharedMatchMapping.maxCM, 1);
         }
     }
-
-    matchLabel.textContent = "Matching Complete.";
 
     var downloadMatchDataButton = document.getElementById('btnDownloadMatchData');
     downloadMatchDataButton.disabled = false;

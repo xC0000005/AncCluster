@@ -17,7 +17,6 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
   // When the extension is installed or upgraded ...
   chrome.runtime.onInstalled.addListener(function() {
     chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      alert("Active");
       chrome.declarativeContent.onPageChanged.addRules([
         {
           conditions: [
