@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }, false);
 
     /*
+    For now, let people use the GA website for visualization.
     var showMatchesButton = document.getElementById('btnShowSharedMatches');
     showMatchesButton.addEventListener('click', function () {
 
