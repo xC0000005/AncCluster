@@ -10,13 +10,6 @@
         "declarativeContent",
         "https://www.ancestry.com/"
       ],
-    "content_scripts": [
-        {
-            "matches": ["https://www.ancestry.com/discoveryui-matches/match-list/*", 
-                        "https://www.ancestry.com/discoveryui-matches/compare/*"],
-            "js": ["contentScript.js"]
-        }
-    ],
     "background": {
         "scripts": ["background.js"],
         "persistent": false
