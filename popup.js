@@ -121,7 +121,7 @@ async function getMatchPage(fetchUrl, match_id, minCM, maxCM, page) {
             }
 
             var matchLabel = document.getElementById("lblSharedMatch");
-            matchLabel.textContent = "Matching Complete.";
+            matchLabel.textContent = "Complete.";
         
             chrome.storage.local.set({'matchData': sharedMatchMapping});
         }
@@ -175,7 +175,7 @@ async function gatherSharedMatches(url) {
           count++;
         }
       }
-
+    
     progressBar.max = count;
     progressBar.value = 0;
 
@@ -183,25 +183,33 @@ async function gatherSharedMatches(url) {
     // This is the format of the match list URL:
     // Getting the shared matches for a single match:
     // https://www.ancestry.com/discoveryui-matchesservice/api/samples/THE_PERSONS_TESTID/matches/list?page=1&relationguid=SHAREDMATCH_TEST_ID&sortby=RELATIONSHIP
-    for (var propertyName in sharedMatchMapping.Matches) {
-        if (sharedMatchMapping.Matches.hasOwnProperty(propertyName)) {
-          count++;
+    for (var matchingName in sharedMatchMapping.Matches) {
+        if (sharedMatchMapping.Matches.hasOwnProperty(matchingName)) {
+        count++;
         
-        progressBar.value = count;
-        matchLabel.textContent = "Matching " + sharedMatchMapping.Matches[propertyName].Name;
-        window.requestAnimationFrame(() => {});
+        setTimeout((currentMatch) => {
+            var progressBar = document.getElementById("prgMatchGathering");
+            var matchLabel = document.getElementById("lblSharedMatch");
+            progressCounter = progressBar.value;
+            progressCounter++;
 
-        var testId = sharedMatchMapping.Matches[propertyName].TestId;
-        let fullFetchUrl = 'https://www.ancestry.com/discoveryui-matchesservice/api/samples/SAMPLEID/matches/list?page=PAGE_NUMBER&relationguid=SHAREDMATCH_TEST_ID&sortby=RELATIONSHIP'
-            .replace('SAMPLEID', sharedMatchMapping.PrimarySampleId)
-            .replace('SHAREDMATCH_TEST_ID', testId);
+            progressBar.value = progressCounter;
+            matchLabel.textContent = currentMatch.Name;
+            window.requestAnimationFrame(() => {});
 
-        await getMatchPage(fullFetchUrl, testId, sharedMatchMapping.minCM, sharedMatchMapping.maxCM, 1);
+            var testId = currentMatch.TestId;
+            let fullFetchUrl = 'https://www.ancestry.com/discoveryui-matchesservice/api/samples/SAMPLEID/matches/list?page=PAGE_NUMBER&relationguid=SHAREDMATCH_TEST_ID&sortby=RELATIONSHIP'
+                .replace('SAMPLEID', sharedMatchMapping.PrimarySampleId)
+                .replace('SHAREDMATCH_TEST_ID', testId);
+            getMatchPage(fullFetchUrl, testId, sharedMatchMapping.minCM, sharedMatchMapping.maxCM, 1);
+            }, 1000 + ( count * 1000 ), sharedMatchMapping.Matches[matchingName]);
         }
     }
 
+    setTimeout(() => {
     var downloadMatchDataButton = document.getElementById('btnDownloadMatchData');
     downloadMatchDataButton.disabled = false;
+    }, 5000);
 }
 
 function disableButtons() {
