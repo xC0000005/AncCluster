@@ -2,14 +2,50 @@
 // page to display.
 var sharedMatchMapping = new Object();
 
-// Handy sleep function for making sure we don't overload Ancestry's servers.
-function sleep(milliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-      currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
-  }
+function downloadFile(filename, data) {
+    var blob = new Blob([data], {type: 'text/csv'});
+    if(window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveBlob(blob, filename);
+    }
+    else{
+        var elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(blob);
+        elem.download = filename;        
+        document.body.appendChild(elem);
+        elem.click();        
+        document.body.removeChild(elem);
+    }
+}
+
+// Build and download two files - 
+// One is the match list, one is the
+// shared match data.
+function downloadMatchData() {
+    var matchList = ""; // This will be the CSV of match names
+    var sharedMatchList = "" // This will be the CSV of who shares what matches
+    var first = true;
+
+    // Go through and add a group property.
+    for (var propertyName in sharedMatchMapping.Matches) {
+        if (sharedMatchMapping.Matches.hasOwnProperty(propertyName)) {
+            var singleMatch = sharedMatchMapping.Matches[propertyName];
+            matchList = matchList.concat('\"' + singleMatch.Name + '\"');
+            matchList = matchList.concat('\r\n');
+            for (var propertyName in singleMatch.SharedMatches) {
+                if (singleMatch.SharedMatches.hasOwnProperty(propertyName)) {
+                    var sharedMatch = singleMatch.SharedMatches[propertyName];
+                    sharedMatchList = sharedMatchList.concat('\"' + singleMatch.Name + '\"');
+                    sharedMatchList = sharedMatchList.concat(',');
+                    sharedMatchList = sharedMatchList.concat('\"' + sharedMatch.Name + '\"');
+                    sharedMatchList = sharedMatchList.concat('\r\n');
+                }
+            }        
+        }
+    }
+    
+    downloadFile("matches.csv", matchList);
+    downloadFile("sharedmatches.csv", sharedMatchList);
+}
 
 // Process the list of match data
 // Read the match data, then filter each based on 
@@ -74,15 +110,14 @@ async function getMatchPage(fetchUrl, match_id, minCM, maxCM, page) {
     fetch(fullFetchUrl).then(r => r.json()).then(result => {
         var moreData = processMatchListData(result, match_id, minCM, maxCM);
         if (moreData) {
-\            // Do NOT overload the server - call carefully - this will produce a 2 -3 second delay
-            // between paging calls.
-            sleep(2000 + ((Math.floor(Math.random() * 10)) * 100));
             getMatchPage(fetchUrl, matches, minCM, maxCM, page + 1);
         }
         else {
             // Save the data in storage for the UI page.
             if (match_id == "") {
                 alert("Match List complete.");
+                var getSharedMatchesButton = document.getElementById('btnGetSharedMatches');
+                getSharedMatchesButton.disabled = false;
             }
 
             chrome.storage.local.set({'matchData': sharedMatchMapping});
@@ -97,7 +132,8 @@ async function setMatchList(url) {
     // https://www.ancestry.com/discoveryui-matches/match-list/THE_GUID_OF_THE_SAMPLE
     // And the guid at the end is what matters.
     let sampleId = url.replace('https://www.ancestry.com/discoveryui-matches/match-list/', '');
-
+    sampleId = sampleId.split('/')[0];
+    
     // First, let's get the min and max CM data from the controls.
     var txtMaxCM = document.getElementById('txtMaxCM');
     var maxCM = txtMaxCM.value;
@@ -128,6 +164,7 @@ async function gatherSharedMatches(url) {
     progressDiv.hidden = false;
 
     var progressBar = document.getElementById("prgMatchGathering");
+    var matchLabel = document.getElementById("lblSharedMatch");
 
     var count = 0;
     for (var propertyName in sharedMatchMapping.Matches) {
@@ -147,6 +184,7 @@ async function gatherSharedMatches(url) {
           count++;
         
         progressBar.value = count;
+        matchLabel.textContent = "Matching " + sharedMatchMapping.Matches[propertyName].Name;
         var testId = sharedMatchMapping.Matches[propertyName].TestId;
         let fullFetchUrl = 'https://www.ancestry.com/discoveryui-matchesservice/api/samples/SAMPLEID/matches/list?page=PAGE_NUMBER&relationguid=SHAREDMATCH_TEST_ID&sortby=RELATIONSHIP'
             .replace('SAMPLEID', sharedMatchMapping.PrimarySampleId)
@@ -156,7 +194,18 @@ async function gatherSharedMatches(url) {
         }
     }
 
-    progressDiv.hidden = true;       
+    matchLabel.textContent = "Matching Complete.";
+
+    var downloadMatchDataButton = document.getElementById('btnDownloadMatchData');
+    downloadMatchDataButton.disabled = false;
+}
+
+function disableButtons() {
+    var getSharedMatchesButton = document.getElementById('btnGetSharedMatches');
+    getSharedMatchesButton.disabled = true;
+   
+    var downloadMatchDataButton = document.getElementById('btnDownloadMatchData');
+    downloadMatchDataButton.disabled = true;                   
 }
 
 // Used to only open one instance of the matchd data.
@@ -192,6 +241,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }, false);
 
     var getSharedMatchesButton = document.getElementById('btnGetSharedMatches');
+    getSharedMatchesButton.disabled = true;
+
     getSharedMatchesButton.addEventListener('click', function () {
 
         chrome.tabs.getSelected(null, function (tab) {
@@ -208,17 +259,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error(error);
                   }
                })
+            var getSharedMatchesButton = document.getElementById('btnGetSharedMatches');
+            getSharedMatchesButton.disabled = true;
+           
+            var downloadMatchDataButton = document.getElementById('btnDownloadMatchData');
+            downloadMatchDataButton.disabled = true;                   
             alert("Match Data Cleared.");
         });
     }, false);
 
-
+    /*
     var showMatchesButton = document.getElementById('btnShowSharedMatches');
     showMatchesButton.addEventListener('click', function () {
 
         chrome.tabs.getSelected(null, function (tab) {
             openMatchTab('matchData.html');
         });
+    }, false);*/
+
+    var downloadMatchDataButton = document.getElementById('btnDownloadMatchData');
+    downloadMatchDataButton.addEventListener('click', function () {
+        downloadMatchData();
     }, false);
 
 }, false);

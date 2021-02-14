@@ -13,4 +13,3 @@ chrome.runtime.onMessage.addListener(function(message, callback) {
 
     return true;
   });
-  

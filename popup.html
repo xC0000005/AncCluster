@@ -20,9 +20,9 @@
         Minimum CM Match: <input type="number" id="txtMinCM" value="90"></input>
         </P>
         <h1>Operations</h1>
-        <button id="btnSetMatchList">Set Match List</button>
+        <button id="btnSetMatchList">Get DNA Matches</button>
         </P>
-        <button id="btnGetSharedMatches">Gather Shared Matches</button>
+        <button id="btnGetSharedMatches" disabled="true">Gather Shared Matches</button>
         </P>
         <div id="divMatchingProgress" hidden="true">
             <label>Matching </label> <label id="lblSharedMatch"></label>
@@ -31,7 +31,10 @@
         </P>
         <button id="btnClearMatchData">Clear All Data</button>
         </P>
-        <button id="btnShowSharedMatches">Show Matches</button>
+        <!--
+            <button id="btnShowSharedMatches">Show Matches</button>
+        -->
+        <button id="btnDownloadMatchData" disabled="true">Download Match Data</button>
     </body>
     <script src="popup.js"></script>
 </html>
