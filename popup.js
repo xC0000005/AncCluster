@@ -110,7 +110,7 @@ async function getMatchPage(fetchUrl, match_id, minCM, maxCM, page) {
     fetch(fullFetchUrl).then(r => r.json()).then(result => {
         var moreData = processMatchListData(result, match_id, minCM, maxCM);
         if (moreData) {
-            getMatchPage(fetchUrl, matches, minCM, maxCM, page + 1);
+            getMatchPage(fetchUrl, match_id, minCM, maxCM, page + 1);
         }
         else {
             // Save the data in storage for the UI page.
