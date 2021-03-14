@@ -103,9 +103,13 @@ function processMatchListData(matchData, match_id, minCM, maxCM) {
 async function getMatchPage(fetchUrl, match_id, minCM, maxCM, page) { 
     // This is the call for the match list page - we need to replace the sample id (the guid).
     // We want to sort by relationship, because the most important relationships are listed first.
+    // Bookmark data is required for subsequent calls - "bookmarkData":{"moreMatchesAvailable":true,"lastMatchesServicePageIdx":1}
     //https://www.ancestry.com/discoveryui-matchesservice/api/samples/THE_GUID_OF_THE_SAMPLE/matches/list?page=1&sortby=RELATIONSHIP
     let fullFetchUrl = fetchUrl
     .replace('PAGE_NUMBER', page);
+    if (page > 1) {
+        fullFetchUrl = fullFetchUrl + "&bookmarkdata={%22moreMatchesAvailable%22:true,%22lastMatchesServicePageIdx%22:" + page + "}";
+    }
 
     fetch(fullFetchUrl).then(r => r.json()).then(result => {
         var moreData = processMatchListData(result, match_id, minCM, maxCM);
@@ -136,6 +140,7 @@ async function setMatchList(url) {
     // And the guid at the end is what matters.
     let sampleId = url.replace('https://www.ancestry.com/discoveryui-matches/match-list/', '');
     sampleId = sampleId.split('/')[0];
+    sampleId = sampleId.split('?')[0];
     
     // First, let's get the min and max CM data from the controls.
     var txtMaxCM = document.getElementById('txtMaxCM');
