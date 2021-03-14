@@ -127,7 +127,7 @@ async function getMatchPage(fetchUrl, match_id, minCM, maxCM, page) {
             var matchLabel = document.getElementById("lblSharedMatch");
             matchLabel.textContent = "Complete.";
         
-            chrome.storage.local.set({'matchData': sharedMatchMapping});
+            // chrome.storage.local.set({'matchData': sharedMatchMapping});
         }
 
     })
@@ -149,6 +149,12 @@ async function setMatchList(url) {
     var txtMinCM = document.getElementById('txtMinCM');
     var minCM = txtMinCM.value;
     
+    // Validate some input
+    if (maxCM <= minCM) {
+        alert("Maximum CM must be higher than Minimum CM");
+        return;
+    }
+
     // Initialize the object.
     sharedMatchMapping = new Object({"PrimarySampleId": sampleId});
     sharedMatchMapping.Matches = new Object();
@@ -217,6 +223,7 @@ async function gatherSharedMatches(url) {
     }, 5000);
 }
 
+// Turn off the buttons people should not be clicking.
 function disableButtons() {
     var getSharedMatchesButton = document.getElementById('btnGetSharedMatches');
     getSharedMatchesButton.disabled = true;
@@ -236,6 +243,7 @@ function getOwnTabs() {
 }
 
 // Opens the match tab, unless it's already open.
+// This function should be deleted if there's not going to be a matchlist UI
 async function openMatchTab(url) {
     const ownTabs = await getOwnTabs();
     const tab = ownTabs.find(tab => tab.url.includes(url));
