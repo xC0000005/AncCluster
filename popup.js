@@ -144,14 +144,14 @@ async function setMatchList(url) {
     
     // First, let's get the min and max CM data from the controls.
     var txtMaxCM = document.getElementById('txtMaxCM');
-    var maxCM = txtMaxCM.value;
+    var maxCM = parseInt(txtMaxCM.value);
 
     var txtMinCM = document.getElementById('txtMinCM');
-    var minCM = txtMinCM.value;
+    var minCM = parseInt(txtMinCM.value);
     
     // Validate some input
     if (maxCM <= minCM) {
-        alert("Maximum CM must be higher than Minimum CM");
+        alert("Maximum CM " + maxCM + " must be higher than Minimum CM " + minCM + "");
         return;
     }
 
